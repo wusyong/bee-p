@@ -1,6 +1,6 @@
-use crypto::curl::constants::CURL_HASH_TRIT_LEN as HASH_LEN;
-use crypto::curl::constants::CURL_P_81 as NUM_ROUNDS;
-use crypto::curl::constants::CURL_STAT_TRIT_LEN as STATE_LEN;
+//use crypto::curl::constants::CURL_HASH_TRIT_LEN as HASH_LEN;
+use crypto::CURLP_81_ROUNDS as NUM_ROUNDS;
+use crypto::{HASH_LEN, STATE_LEN};
 
 use common::constants::NONCE_TRIT_LEN as NONCE_LEN;
 

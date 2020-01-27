@@ -2,7 +2,10 @@ use crate::iota_seed::IotaSeed;
 use crate::{
     slice_eq, PrivateKey, PrivateKeyGenerator, PublicKey, RecoverableSignature, Seed, Signature,
 };
-use crypto::{Sponge, Trits, TritsBuf, TritsMut};
+
+use crypto::Sponge;
+use ternary::{Trits, TritsBuf, TritsMut};
+
 use std::marker::PhantomData;
 
 // TODO constants

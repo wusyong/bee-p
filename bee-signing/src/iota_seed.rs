@@ -1,4 +1,6 @@
-use crypto::{Sponge, TritsBuf};
+use crypto::Sponge;
+use ternary::TritsBuf;
+
 // TODO Remove when available in bee
 use crate::Seed;
 use iota_conversion::Trinary;

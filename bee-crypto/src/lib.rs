@@ -7,23 +7,13 @@
 //!
 //! [PR #21]: https://github.com/iotaledger/bee-rfcs/pull/21
 
-#[cfg(test)]
-mod utils;
-
+mod constants;
 mod curlp;
-mod trits;
 
-pub use curlp::{
-    CurlP,
-    CurlP27,
-    CurlP81,
-};
-pub use trits::{
-    Trits,
-    TritsMut,
-    TritsBuf,
-    ValidTrits,
-};
+pub use constants::*;
+pub use curlp::{CurlP, CurlP27, CurlP81};
+
+use ternary::{Trits, TritsBuf, TritsMut, ValidTrits};
 
 /// The common interface of cryptographic hash functions that follow the sponge construction,
 /// and that absorb and return binary-coded, balanced ternary.

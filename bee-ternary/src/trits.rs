@@ -2,7 +2,7 @@ use std::convert::TryFrom;
 
 /// An owned, mutable container of trits
 #[derive(Clone, Debug, PartialEq)]
-pub struct TritsBuf(pub(crate) Vec<i8>);
+pub struct TritsBuf(pub Vec<i8>);
 
 /// The possible values that a balanced trit can have.
 pub enum ValidTrits {
@@ -62,9 +62,7 @@ impl TritsBuf {
     /// Overwrite all elements in the `TritsBuf` with `v`.
     pub fn fill(&mut self, v: ValidTrits) {
         let v = v.into();
-        self.0
-            .iter_mut()
-            .for_each(|x| *x = v);
+        self.0.iter_mut().for_each(|x| *x = v);
     }
 
     /// Create a `Trits` from a `&[i8]` slice without verifying that its bytes are
@@ -115,7 +113,7 @@ impl TryFrom<Vec<i8>> for TritsBuf {
     fn try_from(vs: Vec<i8>) -> Result<Self, Self::Error> {
         for v in &vs {
             match v {
-                0 | -1 | 1 => {},
+                0 | -1 | 1 => {}
                 _ => Err(FromI8Error)?,
             }
         }
@@ -129,7 +127,7 @@ impl TryFrom<Vec<u8>> for TritsBuf {
     fn try_from(vs: Vec<u8>) -> Result<Self, Self::Error> {
         for v in &vs {
             match v {
-                0b0000_0000 | 0b1111_1111 | 0b0000_0001 => {},
+                0b0000_0000 | 0b1111_1111 | 0b0000_0001 => {}
                 _ => Err(FromU8Error)?,
             }
         }
@@ -139,10 +137,10 @@ impl TryFrom<Vec<u8>> for TritsBuf {
 }
 
 #[derive(Debug, PartialEq)]
-pub struct Trits<'a>(pub(crate) &'a [i8]);
+pub struct Trits<'a>(pub &'a [i8]);
 
 #[derive(Debug, PartialEq)]
-pub struct TritsMut<'a>(pub(crate) &'a mut [i8]);
+pub struct TritsMut<'a>(pub &'a mut [i8]);
 
 pub struct FromU8Error;
 pub struct FromI8Error;
@@ -180,10 +178,7 @@ impl<'a> Trits<'a> {
     /// **WARNING:** If used incorrectly (that is, if the bytes are not correctly encoding trits), the
     /// usage of `Trits` might lead to unexpected behaviour.
     pub fn from_u8_unchecked(v: &[u8]) -> Self {
-        Self::from_i8_unchecked(
-            unsafe {
-                &*(v as *const _ as *const [i8])
-        })
+        Self::from_i8_unchecked(unsafe { &*(v as *const _ as *const [i8]) })
     }
 
     /// Return a borrow of the inner slice wrapped by `Trits`.
@@ -198,12 +193,12 @@ impl<'a> TryFrom<&'a [u8]> for Trits<'a> {
     fn try_from(v: &[u8]) -> Result<Self, Self::Error> {
         for byte in v {
             match byte {
-                0b0000_0000 | 0b1111_1111 | 0b0000_0001 => {},
+                0b0000_0000 | 0b1111_1111 | 0b0000_0001 => {}
                 _ => Err(FromU8Error)?,
             }
         }
 
-        Ok( Self::from_u8_unchecked(v) )
+        Ok(Self::from_u8_unchecked(v))
     }
 }
 
@@ -213,12 +208,12 @@ impl<'a> TryFrom<&'a [i8]> for Trits<'a> {
     fn try_from(v: &'a [i8]) -> Result<Self, Self::Error> {
         for byte in v {
             match byte {
-                0 | -1 | 1 => {},
+                0 | -1 | 1 => {}
                 _ => Err(FromI8Error)?,
             }
         }
 
-        Ok( Self::from_i8_unchecked(v) )
+        Ok(Self::from_i8_unchecked(v))
     }
 }
 
@@ -232,10 +227,7 @@ impl<'a> TritsMut<'a> {
     }
 
     pub fn from_u8_unchecked(v: &mut [u8]) -> Self {
-        Self::from_i8_unchecked(
-            unsafe {
-                &mut *(v as *mut _ as *mut [i8])
-        })
+        Self::from_i8_unchecked(unsafe { &mut *(v as *mut _ as *mut [i8]) })
     }
 
     /// Return a borrow of the inner slice wrapped by `Trits`.
@@ -254,15 +246,14 @@ impl<'a> TryFrom<&'a mut [i8]> for TritsMut<'a> {
     fn try_from(v: &'a mut [i8]) -> Result<Self, Self::Error> {
         for byte in v.iter() {
             match byte {
-                0 | -1 | 1 => {},
+                0 | -1 | 1 => {}
                 _ => Err(FromI8Error)?,
             }
         }
 
-        Ok( Self::from_i8_unchecked(v) )
+        Ok(Self::from_i8_unchecked(v))
     }
 }
-
 
 impl<'a> TryFrom<&'a mut [u8]> for TritsMut<'a> {
     type Error = FromU8Error;
@@ -270,11 +261,11 @@ impl<'a> TryFrom<&'a mut [u8]> for TritsMut<'a> {
     fn try_from(v: &mut [u8]) -> Result<Self, Self::Error> {
         for byte in v.iter() {
             match byte {
-                0b0000_0000 | 0b1111_1111 | 0b0000_0001 => {},
+                0b0000_0000 | 0b1111_1111 | 0b0000_0001 => {}
                 _ => Err(FromU8Error)?,
             }
         }
 
-        Ok( Self::from_u8_unchecked(v) )
+        Ok(Self::from_u8_unchecked(v))
     }
 }
