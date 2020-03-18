@@ -90,6 +90,14 @@ pub struct Index(pub usize);
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Hash(TritBuf<T1B1Buf>);
 
+impl std::hash::Hash for Hash {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.0.as_i8_slice().hash(state);
+    }
+}
+
+impl Eq for Hash {}
+
 impl Hash {
     pub fn zeros() -> Self {
         Self(TritBuf::zeros(BUNDLE_HASH.trit_offset.length))
