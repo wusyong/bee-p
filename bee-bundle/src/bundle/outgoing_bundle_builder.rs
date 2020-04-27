@@ -98,7 +98,7 @@ where
             let hash = sponge
                 .squeeze()
                 .unwrap_or_else(|_| panic!("Panicked when unwrapping the sponge hash function."));
-
+            
             let hash = normalize_hash(&hash);
             let mut has_m_bug = false;
             for trits in hash.chunks(3) {
@@ -147,6 +147,7 @@ where
         };
 
         for builder in &mut self.builders.0 {
+            println!("{:?}",&hash);
             builder.bundle.replace(hash.clone());
         }
 
