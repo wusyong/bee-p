@@ -14,3 +14,5 @@ homepage = "https://www.iota.org"
 bee-crypto = { git = "https://github.com/iotaledger/bee.git" }
 bee-signing = { git = "https://github.com/iotaledger/bee.git" }
 bee-ternary = { git = "https://github.com/iotaledger/bee.git", features = ["serde1"] }
+serde = { version = "1.0", features = ["derive"] }
+bincode = "1.3"
