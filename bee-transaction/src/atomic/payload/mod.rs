@@ -18,7 +18,7 @@ mod unsigned_data;
 pub use indexation::Indexation;
 pub use milestone::Milestone;
 pub use signed_data::SignedData;
-pub use signed_transaction::SignedTransaction;
+pub use signed_transaction::*;
 pub use unsigned_data::UnsignedData;
 
 #[derive(Clone)]
