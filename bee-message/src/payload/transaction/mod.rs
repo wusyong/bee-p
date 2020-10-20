@@ -346,16 +346,17 @@ impl<'a> TransactionBuilder<'a> {
 
         let mut unlock_blocks = Vec::new();
         let mut last_index = (None, -1);
-        for (_i, path) in &inputs {
+        for (i, path) in &inputs {
             if last_index.0 == Some(path) {
                 // TODO justify unwrap
                 unlock_blocks.push(UnlockBlock::Reference(
                     ReferenceUnlock::new(last_index.1 as u16).unwrap(),
                 ));
             } else {
-                let serialized_inputs = [];
+                //let serialized_inputs = [];
                 // TODO
-                // let serialized_inputs = bincode::serialize(i).map_err(|_| Error::HashError)?;
+                let mut serialized_inputs = vec![];
+                i.pack(&mut serialized_inputs).map_err(|_| Error::HashError)?;
                 match &self.seed {
                     Seed::Ed25519(s) => {
                         let private_key = Ed25519PrivateKey::generate_from_seed(s, &path)?;
