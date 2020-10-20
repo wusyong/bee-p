@@ -36,7 +36,7 @@ use bee_signing_ext::{
 use serde::{Deserialize, Serialize};
 
 use alloc::{boxed::Box, vec::Vec};
-use core::{cmp::Ordering, slice::Iter};
+use core::{cmp::Ordering, convert::TryFrom, slice::Iter};
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Transaction {
@@ -225,6 +225,19 @@ impl Transaction {
         // TODO The transaction is spending the entirety of the funds of the referenced UTXOs to the outputs.
 
         Ok(())
+    }
+}
+
+impl TryFrom<(TransactionEssence, Box<[UnlockBlock]>)> for Transaction {
+    type Error = crate::Error;
+
+    fn try_from(value: (TransactionEssence, Box<[UnlockBlock]>)) -> Result<Self, Self::Error> {
+        let tx = Transaction {
+            essence: value.0,
+            unlock_blocks: value.1,
+        };
+
+        Ok(tx)
     }
 }
 
