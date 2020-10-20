@@ -334,7 +334,7 @@ impl<'a> TransactionBuilder<'a> {
 
     pub fn build(self) -> Result<Transaction, Error> {
         let inputs = self.inputs;
-        let outputs = self.outputs;
+        let outputs = self.outputs.into_boxed_slice();
 
         if inputs.is_empty() || outputs.is_empty() {
             return Err(Error::CountError);
@@ -344,24 +344,37 @@ impl<'a> TransactionBuilder<'a> {
         // inputs.sort();
         // outputs.sort();
 
+        // Create transaction essence and keep track of input path at the same time
+        let (mut utxo, mut paths) = (Vec::new(), Vec::new());
+        inputs.into_iter().for_each(|(i, p)| {
+            utxo.push(i);
+            paths.push(p);
+        });
+        let (inputs, path) = (utxo.into_boxed_slice(), paths.into_boxed_slice());
+        // TODO use TransactionEssenceBuilder
+        let essence = TransactionEssence {
+            inputs,
+            outputs,
+            payload: self.payload,
+        };
+        let mut serialized_essence = Vec::new();
+        essence.pack(&mut serialized_essence).map_err(|_| Error::HashError)?;
+
         let mut unlock_blocks = Vec::new();
         let mut last_index = (None, -1);
-        for (i, path) in &inputs {
+        for path in path.iter() {
+            // Check if current path is same as previous path
             if last_index.0 == Some(path) {
-                // TODO justify unwrap
-                unlock_blocks.push(UnlockBlock::Reference(
-                    ReferenceUnlock::new(last_index.1 as u16).unwrap(),
-                ));
+                // If so, add a reference unlock block
+                unlock_blocks.push(UnlockBlock::Reference(ReferenceUnlock::new(last_index.1 as u16)?));
             } else {
-                //let serialized_inputs = [];
-                // TODO
-                let mut serialized_inputs = vec![];
-                i.pack(&mut serialized_inputs).map_err(|_| Error::HashError)?;
+                // If not, we should create a signature unlock block
                 match &self.seed {
                     Seed::Ed25519(s) => {
-                        let private_key = Ed25519PrivateKey::generate_from_seed(s, &path)?;
+                        let private_key = Ed25519PrivateKey::generate_from_seed(s, path)?;
                         let public_key = private_key.generate_public_key().to_bytes();
-                        let signature = Box::new(private_key.sign(&serialized_inputs).to_bytes());
+                        // The block should sign the entire transaction essence part of the transaction payload
+                        let signature = Box::new(private_key.sign(&serialized_essence).to_bytes());
                         unlock_blocks.push(UnlockBlock::Signature(SignatureUnlock::Ed25519(Ed25519Signature::new(
                             public_key, signature,
                         ))));
@@ -377,23 +390,13 @@ impl<'a> TransactionBuilder<'a> {
                     }
                 }
 
+                // Update last signature block path and index
                 last_index = (Some(path), (unlock_blocks.len() - 1) as isize);
             }
         }
 
-        let inputs: Box<[Input]> = inputs
-            .into_iter()
-            .map(|(i, _)| i)
-            .collect::<Vec<Input>>()
-            .into_boxed_slice();
-
-        // TODO use TransactionEssenceBuilder
         Ok(Transaction {
-            essence: TransactionEssence {
-                inputs,
-                outputs: outputs.into_boxed_slice(),
-                payload: self.payload,
-            },
+            essence,
             unlock_blocks: unlock_blocks.into_boxed_slice(),
         })
     }
